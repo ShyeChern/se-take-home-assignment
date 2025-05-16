@@ -4,7 +4,6 @@ class Node {
   constructor(value) {
     this.value = value;
     this.next = null;
-    this.prev = null;
   }
 }
 export class OrderLinkedList {
@@ -23,9 +22,8 @@ export class OrderLinkedList {
       return;
     }
 
-    temp.prev = this.tail;
     this.tail.next = temp;
-    this.tail = this.tail.next;
+    this.tail = temp;
     this.total++;
   }
 
@@ -40,25 +38,28 @@ export class OrderLinkedList {
 
     let current = this.head;
 
-    // get last vip order
-    while (current.value && current.next) {
-      if (current.value.type === constants.ORDER_TYPE.VIP) {
-        current = current.next;
-      } else if (current.value.type === constants.ORDER_TYPE.NORMAL) {
-        break;
-      }
+    // first element is normal order
+    if (current.value.type === constants.ORDER_TYPE.NORMAL) {
+      temp.next = this.head
+      this.head = temp
+      this.total++;
+      return
     }
 
-    temp.next = current;
-    temp.prev = current.prev;
-    if (!current.prev) {
-      // is head, no vip order
-      this.head = temp;
-    } else {
-      // is middle, have vip order
-      temp.prev.next = temp;
+    // get last vip order position
+    while (current?.next) {
+      if (current.next.value.type === constants.ORDER_TYPE.VIP) {
+        current = current.next;
+        continue;
+      }
+      break;
     }
-    current.prev = temp;
+    // set tail if it is last one
+    if (!current?.next) {
+      this.tail = temp
+    }
+    temp.next = current.next
+    current.next = temp
     this.total++;
   }
 
@@ -72,7 +73,6 @@ export class OrderLinkedList {
       this.tail = null;
     } else {
       this.head = this.head.next;
-      this.head.prev = null;
     }
 
     this.completedOrders.push(value);
@@ -89,17 +89,5 @@ export class OrderLinkedList {
       current = current.next;
     }
     return result;
-  }
-
-  printList() {
-    let result = "";
-    let head = this.head;
-
-    while (head !== null) {
-      result += head.value.no + " ";
-      head = head.next;
-    }
-
-    console.log(result.trim());
   }
 }
