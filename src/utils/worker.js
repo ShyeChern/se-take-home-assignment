@@ -6,7 +6,7 @@ self.onmessage = function (message) {
 
   if (data.action === constants.ACTION.START) {
     interval = setInterval(() => {
-      self.postMessage({ action: constants.ACTION.DEQUEUE });
+      self.postMessage({ action: constants.ACTION.COMPLETE });
     }, constants.INTERVAL);
   }
 

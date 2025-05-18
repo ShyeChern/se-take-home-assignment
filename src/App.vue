@@ -26,7 +26,7 @@ const addBot = () => {
   const worker = new Worker()
   worker.onmessage = (message) => {
     const data = message.data;
-    if (data.action === constants.ACTION.DEQUEUE) {
+    if (data.action === constants.ACTION.COMPLETE) {
       orders.removeHead();
       if (orders.total < runningBot.value) {
         worker.postMessage({ action: constants.ACTION.STOP });

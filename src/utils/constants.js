@@ -1,10 +1,10 @@
-export const INTERVAL = 3000;
+export const INTERVAL = 10000;
 export const ORDER_TYPE = {
   NORMAL: "NORMAL",
   VIP: "VIP",
 };
 export const ACTION = {
-  DEQUEUE: "DEQUEUE",
+  COMPLETE: "COMPLETE",
   START: "START",
   STOP: "STOP",
 };
