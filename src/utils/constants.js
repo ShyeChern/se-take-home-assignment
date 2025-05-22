@@ -7,6 +7,7 @@ export const ACTION = {
   COMPLETE: "COMPLETE",
   START: "START",
   STOP: "STOP",
+  UPDATE_TIMER: "UPDATE_TIMER",
 };
 export const STATUS = {
   IDLE: "IDLE",

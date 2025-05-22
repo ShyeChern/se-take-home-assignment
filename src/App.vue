@@ -27,15 +27,25 @@ const addBot = () => {
   worker.onmessage = (message) => {
     const data = message.data;
     if (data.action === constants.ACTION.COMPLETE) {
+      const bot = bots.find(v => v.id === data.id)
+      bot.status = constants.STATUS.IDLE
       orders.removeHead();
-      if (orders.total < runningBot.value) {
-        worker.postMessage({ action: constants.ACTION.STOP });
-        bots[currentNo].status = constants.STATUS.IDLE
-        runningBot.value--;
+      worker.postMessage({ action: constants.ACTION.STOP });
+      bots[currentNo].status = constants.STATUS.IDLE
+      runningBot.value--;
+      if (orders.total >= runningBot.value) {
+        checkOrder()
+      }
+    }
+
+    if (data.action === constants.ACTION.UPDATE_TIMER) {
+      const bot = bots.find(v => v.id === data.id)
+      if (bot) {
+        bot.remainingTime = data.remainingTime
       }
     }
   }
-  bots.push({ status: constants.STATUS.IDLE, worker, id: bots.length });
+  bots.push({ status: constants.STATUS.IDLE, worker, id: Date.now() });
   checkOrder();
 };
 
@@ -49,14 +59,14 @@ const removeBot = () => {
 
 const checkOrder = () => {
   if (orders.total === 0) return;
-  if (orders.total <= runningBot.value) return
+  if (orders.total < runningBot.value) return
   if (runningBot.value === bots.length) return
 
   const bot = bots.find(v => v.status === constants.STATUS.IDLE)
   if (bot) {
     bot.status = constants.STATUS.WORKING
     runningBot.value++
-    bot.worker.postMessage({ action: constants.ACTION.START });
+    bot.worker.postMessage({ action: constants.ACTION.START, id: bot.id });
   }
 }
 
@@ -78,7 +88,12 @@ const checkOrder = () => {
 
       <section class="d-flex mt-4">
         <div class="card card-body">Total Bot: {{ bots.length }}</div>
-        <div class="card card-body">Running Bot: {{ runningBot }}</div>
+        <div class="card card-body">
+          Running Bot: {{ runningBot }}
+          <div v-for="bot in bots" :key="bot.id">
+            {{ bot.id }} - {{ bot.status }} - {{ bot.remainingTime ?? constants.INTERVAL / 1000 }}
+          </div>
+        </div>
       </section>
       <section>
         <div class="card">
